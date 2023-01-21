@@ -1,5 +1,5 @@
-files = 'upload/data.txt'
-# alter_txt = 'ALTER TABLE {table_name} RENAME COLUMN {old_name_column} to {new_name_column}'
+input_file = 'upload/data.txt'
+output_dir = 'upload/xml'
 header = '''<?xml version="1.0" encoding="UTF-8"?>
 
 <databaseChangeLog
