@@ -26,6 +26,7 @@ def get_tables_and_columns(data) -> defaultdict:
     return hash_tables
 
 
+# TODO: Исключить выбор колонок с английским текстом. Если колонка на английском тексте, то не переводить ее еще раз
 def translate_columns() -> defaultdict:
     """
     Перевод колонок и на выходе получаем структуру:
@@ -61,10 +62,32 @@ def get_data_alter_name_columns():
             list_all_columns = list(zip(column1, column2))
             for elem in list_all_columns:
                 old, new = elem
-                data = f'ALTER TABLE {table1} RENAME COLUMN "{old}" to {new}'
+                data = f'ALTER TABLE {table1} RENAME COLUMN "{old}" to {new};'
                 alter_name_data[table1].append(data)
 
     return alter_name_data
 
 
-pprint(get_data_alter_name_columns())
+# TODO: исправить на DRY c предыдущей функцией get_data_alter_name_columns()
+def get_comment_for_column():
+    """
+    Получаем комментарии на русском языке для каждого столбца
+    :return:
+    """
+    old_name_structure = get_tables_and_columns(files)
+    new_name_structure = translate_columns()
+    comment_name_data = defaultdict(list)
+
+    for table1, column1 in old_name_structure.items():
+        for table2, column2 in new_name_structure.items():
+            list_all_columns = list(zip(column1, column2))
+            for elem in list_all_columns:
+                old, new = elem
+                data = f'comment on column {table1}.{new} is "{old}";'
+                comment_name_data[table1].append(data)
+
+    return comment_name_data
+
+
+#pprint(get_data_alter_name_columns())
+pprint(get_comment_for_column())
