@@ -1,7 +1,8 @@
 from collections import defaultdict
 from googletrans import Translator
-from config import header, footer, files
+from config import header, footer, input_file, output_dir
 from pprint import pprint
+from datetime import datetime
 
 
 def get_tables_and_columns(data) -> defaultdict:
@@ -34,7 +35,7 @@ def translate_columns() -> defaultdict:
 
     :return: defaultdict(list)
     """
-    current_structure_data = get_tables_and_columns(files)
+    current_structure_data = get_tables_and_columns(input_file)
     translator = Translator()
 
     for table, columns in current_structure_data.items():
@@ -44,6 +45,7 @@ def translate_columns() -> defaultdict:
     return current_structure_data
 
 
+# TODO: исправить на DRY c предыдущей функцией get_comment_for_column()
 def get_data_alter_name_columns():
     """
     Мэппинг Alter column для текущего текста колонок и колонок на английском.
@@ -53,7 +55,7 @@ def get_data_alter_name_columns():
     :in2:  Таблица: список колонок на английском языке
     :return: defaultdict(list)
     """
-    old_name_structure = get_tables_and_columns(files)
+    old_name_structure = get_tables_and_columns(input_file)
     new_name_structure = translate_columns()
     alter_name_data = defaultdict(list)
 
@@ -69,12 +71,13 @@ def get_data_alter_name_columns():
 
 
 # TODO: исправить на DRY c предыдущей функцией get_data_alter_name_columns()
+# TODO: неправильно добавляется связка новый - старый комментарий. Неверный порядок вписывается.
 def get_comment_for_column():
     """
     Получаем комментарии на русском языке для каждого столбца
     :return:
     """
-    old_name_structure = get_tables_and_columns(files)
+    old_name_structure = get_tables_and_columns(input_file)
     new_name_structure = translate_columns()
     comment_name_data = defaultdict(list)
 
@@ -89,5 +92,22 @@ def get_comment_for_column():
     return comment_name_data
 
 
-#pprint(get_data_alter_name_columns())
-pprint(get_comment_for_column())
+# TODO: некорректно добавляется информация. 3 раза создается один и тот же файл, а также 3 раза добавляется разделы alter и comments
+def create_xml_file():
+    alter_columns_text = get_data_alter_name_columns()
+    comment_columns_text = get_comment_for_column()
+    i = 1
+
+    for table1, column1 in alter_columns_text.items():
+        for table2, column2 in comment_columns_text.items():
+            name_file = f"{datetime.now()}-{i}-alter_table_{table2}.xml"
+            alter = '\n'.join(column1)
+            comment = '\n'.join(column2)
+            with open(f'{output_dir}/{name_file}', 'w', encoding='UTF-8') as f:
+                info = f'{header}\n{alter}\ncommit;\n{comment}\ncommit;\n{footer}'
+                f.write(info)
+
+            i += 1
+
+
+create_xml_file()
