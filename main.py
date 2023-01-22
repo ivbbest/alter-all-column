@@ -1,12 +1,11 @@
 from collections import defaultdict
-import itertools
 from googletrans import Translator
-from config import header, footer, input_file, output_dir
+from config import header1, header2, footer, input_file, output_dir
 from pprint import pprint
 from datetime import datetime
 
 
-def get_tables_and_columns(data) -> defaultdict:
+def get_tables_and_columns(file) -> defaultdict:
     """
     Получаем из файла структуру по принципу:
     Таблица : Список колонок (на русском или текущем языке)
@@ -15,7 +14,7 @@ def get_tables_and_columns(data) -> defaultdict:
     """
     hash_tables = defaultdict(list)
 
-    with open(data, 'r', encoding='UTF-8') as f:
+    with open(file, 'r', encoding='UTF-8') as f:
         for line in f:
             line = line.strip()
             if line.startswith('*'):
@@ -28,15 +27,18 @@ def get_tables_and_columns(data) -> defaultdict:
     return hash_tables
 
 
-# TODO: Исключить выбор колонок с английским текстом. Если колонка на английском тексте, то не переводить ее еще раз
-def translate_columns() -> defaultdict:
+# TODO: Исключить выбор колонок с английским текстом. Если колонка на английском тексте,
+#  то не переводить его еще раз
+# TODO: Создать словарь для кэширования данных по переводу. Если слово уже есть в словаре,
+#  то дополнительно не нужно его переводить, а брать данные из словаря
+def translate_columns(file) -> defaultdict:
     """
     Перевод колонок и на выходе получаем структуру:
     Таблица: список колонок на английском языке
 
     :return: defaultdict(list)
     """
-    current_structure_data = get_tables_and_columns(input_file)
+    current_structure_data = get_tables_and_columns(file)
     translator = Translator()
 
     for table, columns in current_structure_data.items():
@@ -58,13 +60,14 @@ def merged_columns_for_tables(*tables):
     return merged_elements
 
 
-# TODO: исправить на DRY c предыдущей функцией get_comment_for_column()
-def get_alter_and_comment_data():
+# TODO: исправить на DRY c предыдущей функцией create_xml_file() в части обработки двух списков/кортежей.
+#  Начиная с for table in tables: и до формирования конкретных данных
+def get_alter_and_comment_data(file):
     """
-    Получаем готовые строки с alter и comment для xml файла
+    Получаем готовые строки с alter и comment для xml файла из входящего текстового файла
     """
-    current_name_columns = get_tables_and_columns(input_file)
-    translate_name_columns = translate_columns()
+    current_name_columns = get_tables_and_columns(file)
+    translate_name_columns = translate_columns(file)
 
     tables_and_columns = merged_columns_for_tables(current_name_columns, translate_name_columns)
     tables = tables_and_columns.keys()
@@ -83,12 +86,15 @@ def get_alter_and_comment_data():
     return alter_data, comment_data
 
 
-def create_xml_file():
-    """Создание xml файла"""
-    alter_columns_text, comment_columns_text = get_alter_and_comment_data()
+# TODO: исправить на DRY c предыдущей функцией get_alter_and_comment_data() в части обработки двух списков/кортежей.
+#  Начиная с for table in tables: и до формирования конкретных данных
+def create_xml_file(file):
+    """Создание xml файла на основе текстового файла с входящими данными"""
+    alter_columns_text, comment_columns_text = get_alter_and_comment_data(file)
     merged_dataset = merged_columns_for_tables(alter_columns_text, comment_columns_text)
-    i = 1
     tables = merged_dataset.keys()
+
+    i = 1
 
     for table in tables:
         alter_rows, comment_rows = merged_dataset[table]
@@ -96,10 +102,11 @@ def create_xml_file():
         alter = '\n'.join(alter_rows)
         comment = '\n'.join(comment_rows)
         with open(f'{output_dir}/{name_file}', 'w', encoding='UTF-8') as f:
-            info = f'{header}\n{alter}\ncommit;\n\n{comment}\ncommit;\n\n{footer}'
+            info = f'{header1} {table}\" {header2}\n{alter}\ncommit;\n\n{comment}\ncommit;\n\n{footer}'
             f.write(info)
 
         i += 1
 
 
-create_xml_file()
+if __name__ == "__main__":
+    create_xml_file(input_file)
