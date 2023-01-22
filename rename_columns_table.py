@@ -1,6 +1,6 @@
 from collections import defaultdict
 from googletrans import Translator
-from config import header1, header2, footer, input_file, output_dir
+from settings import header1, header2, footer, input_file, output_dir
 from pprint import pprint
 from datetime import datetime
 
