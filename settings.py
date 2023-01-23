@@ -1,5 +1,5 @@
 input_file = 'upload/data.txt'
-output_dir = 'upload/xml'
+output_dir = 'download/xml'
 header1 = '''<?xml version="1.0" encoding="UTF-8"?>\n<databaseChangeLog\n
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"\n
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n

@@ -4,8 +4,10 @@ from settings import header1, header2, footer, input_file, output_dir
 from pprint import pprint
 from datetime import datetime
 
+translator = Translator()
 
-def get_tables_and_columns(file) -> defaultdict:
+
+def get_tables_and_columns(file) -> dict:
     """
     Получаем из файла структуру по принципу:
     Таблица : Список колонок (на русском или текущем языке)
@@ -27,28 +29,40 @@ def get_tables_and_columns(file) -> defaultdict:
     return hash_tables
 
 
+# TODO: подумать над реализацией популярного сервиса deepl для перевода https://github.com/DeepLcom/deepl-python
+def translated_word(text: str | list[str]) -> str | list[str]:
+    """Перевод отдельного текста или слова"""
+    return translator.translate(text, dest='en').text
+
+
 # TODO: Исключить выбор колонок с английским текстом. Если колонка на английском тексте,
 #  то не переводить его еще раз
 # TODO: Создать словарь для кэширования данных по переводу. Если слово уже есть в словаре,
 #  то дополнительно не нужно его переводить, а брать данные из словаря
-def translate_columns(file) -> defaultdict:
+def translated_all_columns(file) -> dict:
     """
     Перевод колонок и на выходе получаем структуру:
     Таблица: список колонок на английском языке
 
     :return: defaultdict(list)
     """
+
     current_structure_data = get_tables_and_columns(file)
-    translator = Translator()
 
     for table, columns in current_structure_data.items():
-        columns = [translator.translate(txt, dest='en').text for txt in columns]
+        columns = list(map(translated_word, columns))
+
+        # подумать как исправить код, чтобы работала мнемизация
+        # columns = list(
+        #     map(lambda txt, dictionary_words={'ТБ': 'TB'}: dictionary_words.setdefault(txt, translated_word(txt)),
+        #         columns))
+
         current_structure_data[table] = columns
 
     return current_structure_data
 
 
-def merged_columns_for_tables(*tables):
+def merged_columns_for_tables(*tables) -> dict:
     """Объединение по таблицам колонок с текущим названием и переведенным"""
 
     merged_elements = defaultdict(list)
@@ -67,7 +81,7 @@ def get_alter_and_comment_data(file):
     Получаем готовые строки с alter и comment для xml файла из входящего текстового файла
     """
     current_name_columns = get_tables_and_columns(file)
-    translate_name_columns = translate_columns(file)
+    translate_name_columns = translated_all_columns(file)
 
     tables_and_columns = merged_columns_for_tables(current_name_columns, translate_name_columns)
     tables = tables_and_columns.keys()
@@ -88,7 +102,7 @@ def get_alter_and_comment_data(file):
 
 # TODO: исправить на DRY c предыдущей функцией get_alter_and_comment_data() в части обработки двух списков/кортежей.
 #  Начиная с for table in tables: и до формирования конкретных данных
-def create_xml_file(file):
+def create_xml_file(file) -> None:
     """Создание xml файла на основе текстового файла с входящими данными"""
     alter_columns_text, comment_columns_text = get_alter_and_comment_data(file)
     merged_dataset = merged_columns_for_tables(alter_columns_text, comment_columns_text)
