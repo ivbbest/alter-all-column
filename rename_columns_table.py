@@ -3,6 +3,7 @@ from googletrans import Translator
 from settings import header1, header2, footer, input_file, output_dir
 from pprint import pprint
 from datetime import datetime
+from string import ascii_letters
 
 translator = Translator()
 
@@ -21,7 +22,7 @@ def get_tables_and_columns(file) -> dict:
             line = line.strip()
             if line.startswith('*'):
                 table = line.split('*')[1]
-            elif line == '':
+            elif line == '' or is_english_word(line):
                 continue
             else:
                 hash_tables[table].append(line)
@@ -29,8 +30,13 @@ def get_tables_and_columns(file) -> dict:
     return hash_tables
 
 
+def is_english_word(word: str) -> bool:
+    """Проверка столбец на английском назван или нет"""
+    return len(set(ascii_letters) & set(word)) > 0
+
+
 # TODO: подумать над реализацией популярного сервиса deepl для перевода https://github.com/DeepLcom/deepl-python
-def translated_word(text: str | list[str]) -> str | list[str]:
+def translated_word(text: str | list[str]) -> str | list[str] | None:
     """Перевод отдельного текста или слова"""
     return translator.translate(text, dest='en').text
 
