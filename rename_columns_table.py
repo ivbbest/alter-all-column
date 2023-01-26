@@ -45,7 +45,7 @@ def translated_word(text: str | list[str]) -> str | list[str] | None:
 #  то не переводить его еще раз
 # TODO: Создать словарь для кэширования данных по переводу. Если слово уже есть в словаре,
 #  то дополнительно не нужно его переводить, а брать данные из словаря
-def translated_all_columns(file) -> dict:
+def translated_all_columns(tables_and_columns) -> dict:
     """
     Перевод колонок и на выходе получаем структуру:
     Таблица: список колонок на английском языке
@@ -53,9 +53,7 @@ def translated_all_columns(file) -> dict:
     :return: defaultdict(list)
     """
 
-    current_structure_data = get_tables_and_columns(file)
-
-    for table, columns in current_structure_data.items():
+    for table, columns in tables_and_columns.items():
         columns = list(map(translated_word, columns))
 
         # подумать как исправить код, чтобы работала мнемизация
@@ -63,9 +61,9 @@ def translated_all_columns(file) -> dict:
         #     map(lambda txt, dictionary_words={'ТБ': 'TB'}: dictionary_words.setdefault(txt, translated_word(txt)),
         #         columns))
 
-        current_structure_data[table] = columns
+        tables_and_columns[table] = columns
 
-    return current_structure_data
+    return tables_and_columns
 
 
 def merged_columns_for_tables(*tables) -> dict:
@@ -87,7 +85,7 @@ def get_alter_and_comment_data(file):
     Получаем готовые строки с alter и comment для xml файла из входящего текстового файла
     """
     current_name_columns = get_tables_and_columns(file)
-    translate_name_columns = translated_all_columns(file)
+    translate_name_columns = translated_all_columns(current_name_columns)
 
     tables_and_columns = merged_columns_for_tables(current_name_columns, translate_name_columns)
     tables = tables_and_columns.keys()
