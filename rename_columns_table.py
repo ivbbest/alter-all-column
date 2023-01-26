@@ -128,5 +128,9 @@ def create_xml_file(file) -> None:
         i += 1
 
 
-if __name__ == "__main__":
+def main():
     create_xml_file(input_file)
+
+
+if __name__ == "__main__":
+    main()
