@@ -1,7 +1,6 @@
 from collections import defaultdict
 from googletrans import Translator
 from settings import header1, header2, footer, input_file, output_dir
-from pprint import pprint
 from datetime import datetime
 from string import ascii_letters
 
@@ -35,7 +34,6 @@ def is_english_word(word: str) -> bool:
     return len(set(ascii_letters) & set(word)) > 0
 
 
-# TODO: подумать над реализацией популярного сервиса deepl для перевода https://github.com/DeepLcom/deepl-python
 def translated_word(text: str | list[str]) -> str | list[str] | None:
     """Перевод отдельного текста или слова"""
     return translator.translate(text, dest='en').text
