@@ -1,11 +1,11 @@
-*Table 1
+*Tab_1
 Номер
 Банк
 История
 Комментарий
 Замечания
 
-*Table 2
+*Tab_2
 Кнопка такая py
 Столбец1
 ID флаг
@@ -13,7 +13,7 @@ Comments
 Fact
 Банк
 
-*Table 3
+*Tab_3
 History
 Advanced
 Язык
