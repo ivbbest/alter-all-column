@@ -51,7 +51,10 @@ def translated_word(text: str | list[str]) -> str | list[str] | None:
     """Перевод отдельного текста или слова"""
     try:
         translate_txt = fixed_words_in_translation.get(
-            text, GoogleTranslator(source="ru", target="en").translate(text=text)
+            text,
+            GoogleTranslator(source="ru", target="en").translate(
+                text=text
+            ),  # noqa: E501
         )
         return re.sub(r"\s", "_", translate_txt)
     except ConnectionError:
