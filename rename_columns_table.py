@@ -1,11 +1,15 @@
+# flake8: noqa
 import re
+import time
 from collections import defaultdict
 from datetime import datetime
 from string import ascii_letters
 
+from deep_translator import GoogleTranslator
 from googletrans import Translator
 
 from settings import (
+    fixed_words_in_translation,
     header1,
     header2,
     input_file,
@@ -31,7 +35,7 @@ def get_tables_and_columns(file) -> dict:
             line = line.strip()
             if line.startswith("*"):
                 table = line.split("*")[1]
-            elif line == "" or is_english_word(line):
+            elif line == "":
                 continue
             else:
                 hash_tables[table].append(line)
@@ -46,9 +50,13 @@ def is_english_word(word: str) -> bool:
 
 def translated_word(text: str | list[str]) -> str | list[str] | None:
     """Перевод отдельного текста или слова"""
-    translated_text = translator.translate(text, dest="en").text
-
-    return re.sub(r"\s", "_", translated_text)
+    try:
+        translate_txt = fixed_words_in_translation.get(
+            text, GoogleTranslator(source="ru", target="en").translate(text=text)
+        )
+        return re.sub(r"\s", "_", translate_txt)
+    except ConnectionError:
+        pass
 
 
 # TODO: Исключить выбор колонок с английским текстом.
@@ -151,7 +159,9 @@ def create_xml_file(file) -> None:
 
 
 def main():
+    t_start = time.perf_counter()
     create_xml_file(input_file)
+    print(f"Время выполнения скрипта = {time.perf_counter() - t_start}")
 
 
 if __name__ == "__main__":

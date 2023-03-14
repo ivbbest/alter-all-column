@@ -10,5 +10,10 @@ header2 = 'author="Irkhin-VB" dbms="oracle">\n<sql>'
 # tmp = '2*NVfLB$#*1bFAWc9H1oCIW2j'
 rollback_start = "</sql>\n<rollback>\n\t<sql>\n"
 rollback_end = "\n</sql>\n</rollback>\n</changeSet>\n</databaseChangeLog>"
-
+fixed_words_in_translation = {
+    "ЦУЗ": "CUZ",
+    "Тип объекта": "Tip object",
+    "Вид объекта": "Vid object",
+    "НПЦ1Торг": "NPC1Torg",
+}
 # footer = '</sql>\n</changeSet>\n</databaseChangeLog>'
