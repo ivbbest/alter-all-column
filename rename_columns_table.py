@@ -1,4 +1,3 @@
-# flake8: noqa
 import re
 import time
 from collections import defaultdict
