@@ -16,4 +16,3 @@ fixed_words_in_translation = {
     "Вид объекта": "Vid object",
     "НПЦ1Торг": "NPC1Torg",
 }
-# footer = '</sql>\n</changeSet>\n</databaseChangeLog>'

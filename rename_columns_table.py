@@ -32,33 +32,30 @@ def get_tables_and_columns(file) -> dict:
     with open(file, encoding="UTF-8") as f:
         for line in f:
             line = line.strip()
-            if line.startswith("*"):
-                table = line.split("*")[1]
-            elif line == "":
+            if line.startswith("***"):
+                table = line.split("***")[1]
+            elif line == "" or is_english_word(line):
                 continue
             else:
                 hash_tables[table].append(line)
 
-    return hash_tables
+        return hash_tables
 
 
 def is_english_word(word: str) -> bool:
     """Проверка столбец на английском назван или нет"""
-    return len(set(ascii_letters) & set(word)) > 0
+    letters = set(re.sub("(_| )", "", str(word)))
+
+    return len(set(ascii_letters) & set(word)) == len(letters)
 
 
 def translated_word(text: str | list[str]) -> str | list[str] | None:
     """Перевод отдельного текста или слова"""
-    try:
-        translate_txt = fixed_words_in_translation.get(
-            text,
-            GoogleTranslator(source="ru", target="en").translate(
-                text=text
-            ),  # noqa: E501
-        )
-        return re.sub(r"\s", "_", translate_txt)
-    except ConnectionError:
-        pass
+    translate_txt = fixed_words_in_translation.get(
+        text,
+        GoogleTranslator(source="ru", target="en").translate(text=text),
+    )
+    return re.sub(r"\s", "_", str(translate_txt))
 
 
 # TODO: Исключить выбор колонок с английским текстом.
