@@ -7,7 +7,8 @@ header1 = """<?xml version="1.0" encoding="UTF-8"?>\n<databaseChangeLog
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.9.xsd">
     <changeSet id="alter table"""
 header2 = 'author="Irkhin-VB" dbms="oracle">\n<sql>'
-# tmp = '2*NVfLB$#*1bFAWc9H1oCIW2j'
+# tmp_war = '2*NVfLB$#*1bFAWc9H1oCIW2j'
+# tmp_ed = '&2G$sM8@YnT0lGoqE4zkBG60E3*'
 rollback_start = "</sql>\n<rollback>\n\t<sql>\n"
 rollback_end = "\n</sql>\n</rollback>\n</changeSet>\n</databaseChangeLog>"
 fixed_words_in_translation = {
