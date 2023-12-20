@@ -24,6 +24,7 @@ repos:
     rev: 23.1.0
     hooks:
     -   id: black
+        exclude: README.md
 -   repo: https://github.com/PyCQA/flake8
     rev: 6.0.0
     hooks:

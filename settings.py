@@ -1,5 +1,4 @@
 # flake8: noqa
-# black: noqa
 input_file = "upload/data.txt"
 output_dir = "download/xml"
 header1 = """<?xml version="1.0" encoding="UTF-8"?>\n<databaseChangeLog
